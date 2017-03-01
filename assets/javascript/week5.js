@@ -5,7 +5,6 @@ var incorrectCount = 0;
 var unansweredCount = 0;
 var timeLeft = 5;
 var intervalID;
-var IntervalId2;
 var questionNum = 0;
 var correctAnswer = "";
 var allQuestions = [];
@@ -40,13 +39,17 @@ $("body").on("click", ".answer", checkAnswer);
 
 function start()
 {
-    intervalId = setInterval(decrement, 1000);
+    nextQuestion();
+}
+
+function restartInterval()
+{
+    intervalID = setInterval(decrement, 1000);
 }
 
 function decrement()
 {
-    timeLeft--;
-    $("#time-left").text(timeLeft);
+    $("#time-left").text("Time Left: " + timeLeft);
     if (timeLeft <= 0)
     {
         console.log("less than 0");
@@ -54,6 +57,8 @@ function decrement()
         wrong(2);
        
     }
+    timeLeft--;
+    
 }
 
 function wrong(typeWrong)
@@ -62,12 +67,14 @@ function wrong(typeWrong)
     if (typeWrong === 1)
     {
         console.log("incorrect answer");
+        $("#question").text("Incorrect, the correct answer was: ")
         incorrectCount++;
         $("#incorrect").text("Incorrect: " + incorrectCount);
     }
     else if (typeWrong === 2)
     {
         console.log("timed out");
+        $("#question").text("You have ran out of time, the correct answer was: ")
         unansweredCount++;
         $("#unanswered").text("Unanswered: " + unansweredCount);
     }
@@ -77,18 +84,20 @@ function wrong(typeWrong)
 
 function nextQuestion()
 {
+    $(".answer").animate({ opacity: 100 });
     if(questionNum < allQuestions.length)
     {
-    start();
-    console.log(allQuestions[questionNum]);
-    var currentQuestion = allQuestions[questionNum];
-    $("#question").text(currentQuestion.question);
-    $("#answer1").text("a: " + currentQuestion.answer1);
-    $("#answer2").text("b: " + currentQuestion.answer2);
-    $("#answer3").text("c: " + currentQuestion.answer3);
-    $("#answer4").text("d: " + currentQuestion.answer4);
-    correctAnswer = currentQuestion.correctAnswer;
-    questionNum++;
+        timeLeft = 5;
+        restartInterval();
+        console.log(allQuestions[questionNum]);
+        var currentQuestion = allQuestions[questionNum];
+        $("#question").text(currentQuestion.question);
+        $("#answer1").text("a: " + currentQuestion.answer1);
+        $("#answer2").text("b: " + currentQuestion.answer2);
+        $("#answer3").text("c: " + currentQuestion.answer3);
+        $("#answer4").text("d: " + currentQuestion.answer4);
+        correctAnswer = currentQuestion.correctAnswer;
+        questionNum++;
     }
     else
     {
@@ -98,7 +107,7 @@ function nextQuestion()
 
 function checkAnswer()
 {
-    var temp = $(this).attr("value")
+    
     var tempcorrect = correctAnswer;
     if ($(this).attr("value") === correctAnswer)
     {
@@ -121,14 +130,26 @@ function correct()
 
 function stop()
 {
-    clearInterval(intervalId);
+    clearInterval(intervalID);
 }
 
 function getNext()
 {
-    $("#question").text("Preparing for next question");
+    //$("#question").text("Preparing for next question");
+    isWrong($("#answer1"));
+    isWrong($("#answer2"));
+    isWrong($("#answer3"));
+    isWrong($("#answer4"));
     setTimeout(nextQuestion, 5000);
 
+}
+
+function isWrong(answer)
+{
+    if ($(answer).attr("value") != correctAnswer)
+    {
+        answer.animate({ opacity: 0 }, 4000);
+    }
 }
 //needs objects? question, answer 1, answer2, answer3, answer4, correct answer location. 
 //add all questions to array allQuestions

@@ -1,0 +1,13 @@
+.answer {
+    transition: background-color 1s;
+}
+
+.answer:hover
+{
+    text-align: center;
+    background-color: lightgray;
+}
+
+.jumbotron{
+    text-align: center;
+}
