@@ -4,6 +4,13 @@
         <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="assets/css/week5style.css">
         <meta charset="UTF-8">
+        <!-- 
+          You generally want to stick javascript script tags at the bottom of your body.
+          This is because they will stop the rest of the html from being parsed and rendered
+          until after the script has finished downloading and it's best practice to show 
+          something to the user asap even if it's not initially interactive
+          (most users won't even notice 🙃).
+         -->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Trivia Game!</title>
@@ -12,6 +19,7 @@
 
     
     <header>
+        <!-- It doesn't make a difference functionally, but people generally don't put spaces between attributes and the equals sign -->
          <div class = "container">
             <h1 style = "text-align: center" >Trivia Game!</h1>
          </div>
@@ -30,7 +38,7 @@
                 <img id = "image">
                 <h2 id = "reset">Click Here to Start</h2>
             </div>
-            <div class = "row">
+            <div class = "row answer-row">
                 <p id = "answer1" class = "answer" value = "a"></p>
                 <p id = "answer2" class = "answer" value = "b"></p>
                 <p id = "answer3" class = "answer" value = "c"></p>
