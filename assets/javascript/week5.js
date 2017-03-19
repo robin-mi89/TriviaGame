@@ -1,3 +1,14 @@
+// While it may not seem imperative for smaller programs, you should get in the habit
+// linking to a separate js file and also wrapping your js code in either a 
+// $(document).ready(function(){
+//  // code goes here
+// })
+// or an IIFE (immediately invoked function expression)
+// ;(function(){
+//  // code goes here
+// })()
+// One of the most important reasons for that is security - because right now your global variables
+// can be tampered with through the console by a malicious visitor to your trivia game 😮
 
 //plans for trivia. 
 var correctCount = 0;
@@ -11,7 +22,9 @@ var allQuestions = [];
 var userAnswered = false;
 var audio = $("audio");
 var started = false;
+var answerSelectors = [ '#answer1', '#answer2', '#answer3', '#answer4' ];
 
+// Right on for using the newer class syntax 🙌
 class Question {
     constructor(question, answer1, answer2, answer3, answer4, correctAnswer){
         this.question = question;
@@ -19,6 +32,7 @@ class Question {
         this.answer2 = answer2;
         this.answer3 = answer3;
         this.answer4 = answer4;
+        this.answers = [answer1, answer2, answer3, answer4]
         this.correctAnswer = correctAnswer
     }
 }
@@ -36,11 +50,11 @@ var question9 = new Question("The famous victorian style houses of San Francisco
 allQuestions = [question1, question2, question3, question4, question5, question6, question7, question8, question9];
 
 $(document).ready(function() {
-
-$("#start").on("click", start);
-$("#stop").on("click", stop);
-$("body").on("click", ".answer", checkAnswer);
-$("body").on("click", "#reset", reset);
+    // indentation is good
+    $("#start").on("click", start);
+    $("#stop").on("click", stop);
+    $("body").on("click", ".answer", checkAnswer);
+    $("body").on("click", "#reset", reset);
 });
 
 function start()
@@ -50,6 +64,8 @@ function start()
 
 function restartInterval()
 {
+    // this way the timer will be the as soon as the question appears instead of 1 second after
+    decrement();
     intervalID = setInterval(decrement, 1000);
 }
 
@@ -100,20 +116,23 @@ function nextQuestion()
         //console.log(allQuestions[questionNum]);
         var currentQuestion = allQuestions[questionNum];
         $("#question").text(currentQuestion.question);
-        $("#answer1").text("a: " + currentQuestion.answer1);
-        $("#answer2").text("b: " + currentQuestion.answer2);
-        $("#answer3").text("c: " + currentQuestion.answer3);
-        $("#answer4").text("d: " + currentQuestion.answer4);
+
+        // by putting the answers in an array, you can just loop through them using
+        // the native .forEach and not have to repeat yourself. Doesn't save you a 
+        // ton of code here, but for larger collections it can be quite useful.
+        var options = [ 'a', 'b', 'c', 'd' ]
+        currentQuestion.answers.forEach(function(answer, index) {
+            $( answerSelectors[index] ).text( options[index] + ': ' + answer )
+        })
+
         correctAnswer = currentQuestion.correctAnswer;
         questionNum++;
     }
     else
     {
         $("#question").text("You Completed the Quiz!");
-        $("#answer1").hide();
-        $("#answer2").hide();
-        $("#answer3").hide();
-        $("#answer4").hide();
+        // by targeting the parent row you can save yourself a few lines of repetitive code
+        $(".answer-row").hide();
         $("#reset").text("Click Here to Try Again");
     }
 }
@@ -151,18 +170,20 @@ function stop()
 function getNext()
 {
     //$("#question").text("Preparing for next question");
-    isWrong($("#answer1"));
-    isWrong($("#answer2"));
-    isWrong($("#answer3"));
-    isWrong($("#answer4"));
+    answerSelectors.forEach(function(selector) {
+        isWrong( $(selector) );
+    });
     setTimeout(nextQuestion, 5000);
 
 }
 
 function isWrong(answer)
 {
-    if ($(answer).attr("value") != correctAnswer)
+    // it's best to always use strict equality checking - otherwsie people who 
+    // don't understand the nuances of type coercion checking may introduce pesky bugs 🐛
+    if ($(answer).attr("value") !== correctAnswer)
     {
+        // I really liked this method of revealing the answer
         answer.animate({ opacity: 0 }, 4000);
     }
 }
@@ -187,10 +208,7 @@ function reset()
         $("#incorrect").text("Incorrect: " + incorrectCount);
         $("#correct").text("Correct: " + correctCount);
         $("#unanswered").text("Unanswered: " + unansweredCount);
-        $("#answer1").show();
-        $("#answer2").show();
-        $("#answer3").show();
-        $("#answer4").show();
+        $(".answer-row").show();
         start();
     }
 }
